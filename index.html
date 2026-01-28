@@ -1,117 +1,1067 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>佘山探秘 · 普陀→佘山旅游向导</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上海环球港→佘山定向旅游小游戏（完整地图版）</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "PingFang SC", sans-serif; }
-        body { background: #f0f9ff; color: #333; padding: 20px; }
-        .container { max-width: 500px; margin: 0 auto; }
-        .step { display: none; background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .active { display: block; }
-        h2 { color: #1890ff; margin-bottom: 15px; }
-        input, select, button {
-            width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
         }
-        button { background: #1890ff; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { opacity: 0.9; }
-        .map { height: 200px; background: #e6f7ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 15px 0; }
-        .user-list { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .user-item { padding: 6px 0; border-bottom: 1px dashed #eee; }
-        .poi { background: #fffbe6; padding: 10px; border-left: 4px solid #faad14; margin: 10px 0; border-radius: 0 8px 8px 0; }
+        body {
+            background: #f5f5f5;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+        /* 流程容器 */
+        .process-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        /* 步骤条 */
+        .step-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 0 20px;
+        }
+        .step-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+        .step-bar::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 3px;
+            background: #2ecc71;
+            z-index: 2;
+            transform: translateY(-50%);
+            transition: width 0.5s ease;
+        }
+        .step-bar.step-1::after { width: 0%; }
+        .step-bar.step-2::after { width: 50%; }
+        .step-bar.step-3::after { width: 100%; }
+        .step-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+        .step-item.active {
+            background: #2ecc71;
+            border-color: #2ecc71;
+            color: white;
+        }
+        .step-item.done {
+            background: #2ecc71;
+            border-color: #2ecc71;
+            color: white;
+        }
+        .step-item .step-name {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        /* 导航栏 */
+        .nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #2c3e50;
+            padding: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav-btn {
+            color: white;
+            background: #3498db;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-btn.active {
+            background: #2ecc71;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+        .nav-btn.disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .nav-btn:not(.disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        /* 模块容器 */
+        .module {
+            display: none;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .module.active {
+            display: block;
+            -webkit-animation: fadeIn3d 0.8s ease;
+            animation: fadeIn3d 0.8s ease;
+        }
+        @-webkit-keyframes fadeIn3d {
+            0% {
+                -webkit-transform: perspective(800px) rotateY(30deg);
+                transform: perspective(800px) rotateY(30deg);
+                opacity: 0;
+            }
+            100% {
+                -webkit-transform: perspective(800px) rotateY(0);
+                transform: perspective(800px) rotateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn3d {
+            0% {
+                -webkit-transform: perspective(800px) rotateY(30deg);
+                transform: perspective(800px) rotateY(30deg);
+                opacity: 0;
+            }
+            100% {
+                -webkit-transform: perspective(800px) rotateY(0);
+                transform: perspective(800px) rotateY(0);
+                opacity: 1;
+            }
+        }
+        /* 阶段一：实名认证 */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .auth-form input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .auth-form button {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .data-analysis {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .data-analysis h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .tips {
+            color: #e74c3c;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        /* 阶段二：车票认证 */
+        .ticket-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        .ticket-confirm {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .ticket-confirm-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .ticket-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .ticket-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            transform: perspective(600px) rotateX(5deg);
+            transition: transform 0.3s;
+        }
+        .ticket-card:hover {
+            transform: perspective(600px) rotateX(0);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        /* 阶段三：核心 - 交互地图 */
+        .game-container {
+            display: flex;
+            gap: 20px;
+            height: 850px; /* 调整容器高度，确保地图和面板都能完整显示 */
+        }
+        /* 3D交互地图区域 */
+        .map-area {
+            flex: 2;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            position: relative;
+            background: url('https://img0.baidu.com/it/u=1823266692,3842132192&fm=253&fmt=auto&app=138&f=JPEG?w=1200&h=900') center/cover no-repeat;
+            perspective: 1500px;
+            height: 800px; /* 固定高度，确保所有元素入框 */
+            width: 100%;   /* 固定宽度 */
+            overflow: hidden; /* 强制裁剪溢出内容 */
+        }
+        /* 路线规划提示 */
+        .route-tips {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* 地图节点样式 */
+        .map-node {
+            position: absolute;
+            transform-style: preserve-3d;
+            transform: translateZ(20px);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+            /* 核心修改：减小整体内边距，缩小白色方框 */
+            background: rgba(255,255,255,0.9);
+            padding: 2px 4px; /* 原：5px 8px */
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* 微调阴影，更贴合小方框 */
+        }
+
+        .map-node:hover {
+            transform: translateZ(30px) scale(1.1);
+        }
+        .node-start { /* 起点：环球港 */
+            top: 50px;
+            left: 50px;
+            color: #e74c3c;
+        }
+        .node-end { /* 终点：佘山 */
+            top: 50px;
+            left: 50px;
+            color: #e74c3c;
+        }
+        .node-scenic { /* 景点 */
+            color: #2ecc71;
+        }
+        .node-toilet { /* 厕所 */
+            color: #9b59b6;
+        }
+        .node-rest { /* 休息站 */
+            color: #3498db;
+        }
+        .map-node .icon {
+            font-size: 24px; /* 原：30px，减小图标大小 */
+            margin-bottom: 3px; /* 原：5px，减小图标和文字间距 */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .map-node .name {
+            font-size: 12px; /* 原：14px，减小文字大小 */
+            white-space: nowrap;
+            background: rgba(255,255,255,0.8);
+            padding: 2px 5px; /* 原：3px 8px，减小文字背景内边距 */
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        /* 规划的路线轨迹 */
+        .route-path {
+            position: absolute;
+            background: linear-gradient(to right, #e74c3c, #f39c12);
+            height: 4px;
+            transform: translateZ(10px);
+            z-index: 4;
+            /* 默认隐藏，规划后显示 */
+            display: none;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+            /* 路线动画 */
+            animation: routeDraw 2s ease forwards;
+            width: 0;
+        }
+        @keyframes routeDraw {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        /* 路线节点高亮样式 */
+        .map-node.highlight {
+            transform: translateZ(40px) scale(1.2);
+            animation: nodePulse 1.5s infinite;
+        }
+        @keyframes nodePulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        /* 右侧面板：在线用户+互动+分类 */
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        /* 路线/目的地分类筛选 */
+        .route-filter {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .route-filter h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        .route-filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px 5px 0;
+            font-size: 14px;
+        }
+        .route-filter-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        /* 实时在线用户列表 */
+        .online-users {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .online-users h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .user-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .user-item:hover {
+            background: #f8f9fa;
+        }
+        .user-item.same-route {
+            border-left: 3px solid #2ecc71;
+            background: rgba(46, 204, 113, 0.05);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .user-route {
+            font-size: 12px;
+            color: #666;
+        }
+        .user-tag {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #2ecc71;
+            color: white;
+            margin-left: auto;
+        }
+        /* 角色互动聊天区 */
+        .chat-area {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .chat-msg {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        .msg-self {
+            background: #3498db;
+            color: white;
+            margin-left: auto;
+        }
+        .msg-other {
+            background: #eee;
+            color: #333;
+        }
+        .chat-input {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .chat-input button {
+            padding: 8px 15px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* 景点介绍弹窗 */
+        .scenic-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) perspective(800px) rotateY(0);
+            width: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            padding: 20px;
+            z-index: 100;
+            animation: modal3d 0.5s ease;
+        }
+        @keyframes modal3d {
+            0% { transform: translate(-50%, -50%) perspective(800px) rotateY(30deg) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) perspective(800px) rotateY(0) scale(1); opacity: 1; }
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-close:hover {
+            color: #e74c3c;
+        }
+        .scenic-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .scenic-route-tips {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 5px;
+            font-size: 14px;
+            color: #27ae60;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1 style="text-align:center; margin:20px 0; color:#1890ff;">🚗 佘山探秘之旅</h1>
-
-    <!-- 阶段一：实名认证 -->
-    <div id="step1" class="step active">
-        <h2>👤 实名认证（模拟）</h2>
-        <input type="text" id="name" placeholder="请输入真实姓名" />
-        <input type="text" id="idCard" placeholder="身份证号（模拟）" value="310107199001011234" />
-        <button onclick="nextStep(1)">下一步：车票认证</button>
+<!-- 流程容器 -->
+<div class="process-container">
+    <!-- 步骤条 -->
+    <div class="step-bar step-1" id="stepBar">
+        <div class="step-item active" id="step1">
+            1
+            <div class="step-name">实名认证</div>
+        </div>
+        <div class="step-item" id="step2">
+            2
+            <div class="step-name">车票认证</div>
+        </div>
+        <div class="step-item" id="step3">
+            3
+            <div class="step-name">游戏互动</div>
+        </div>
     </div>
 
-    <!-- 阶段二：车票认证 -->
-    <div id="step2" class="step">
-        <h2>🎫 车票信息</h2>
-        <select id="ageGroup">
-            <option value="adult">成年人 (18-60岁)</option>
-            <option value="child">儿童 (6-17岁)</option>
-            <option value="senior">长者 (60岁以上)</option>
-        </select>
-        <select id="destination">
-            <option value="sheshan">上海·佘山国家森林公园</option>
-            <option value="songjiang">松江广富林</option>
-        </select>
-        <button onclick="nextStep(2)">开始探索旅程</button>
-    </div>
-
-    <!-- 阶段三：游戏互动 -->
-    <div id="step3" class="step">
-        <h2>🗺️ 自动规划路线：普陀环球港 → 佘山</h2>
-        <div class="map">📍 路线图（模拟）：地铁13号线 → 9号线 → 步行</div>
-
-        <div class="poi">
-            <strong>🌟 特殊景点：佘山天文台</strong><br/>
-            中国首座现代天文台，登顶可俯瞰松江全景。
-        </div>
-
-        <div class="poi">
-            <strong>🚻 公共设施</strong><br/>
-            • 佘山南门：休息站 + 厕所<br/>
-            • 天主教堂旁：饮水点 + 急救站
-        </div>
-
-        <h3>👥 实时在线游客（模拟）</h3>
-        <div class="user-list" id="onlineUsers"></div>
-
-        <h3>🎮 角色互动</h3>
-        <p>你当前角色：<strong>探险家·小沪</strong></p>
-        <button onclick="sendGreeting()">向附近游客打招呼</button>
-        <div id="chatBox" style="margin-top:10px; padding:10px; background:#f0f9ff; border-radius:8px;"></div>
+    <!-- 导航栏 -->
+    <div class="nav">
+        <button class="nav-btn active" id="nav1" data-target="auth-module">阶段一：实名认证</button>
+        <button class="nav-btn disabled" id="nav2" data-target="ticket-module">阶段二：车票认证</button>
+        <button class="nav-btn disabled" id="nav3" data-target="game-module">阶段三：游戏互动</button>
     </div>
 </div>
 
+<!-- 阶段一：实名认证模块 -->
+<div class="module active" id="auth-module">
+    <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">阶段一：实名认证（模拟）</h2>
+    <p class="tips">请完成实名认证，提交后解锁车票认证环节</p>
+    <div class="auth-form">
+        <input type="text" id="realName" placeholder="请输入真实姓名">
+        <input type="text" id="idCard" placeholder="请输入身份证号（模拟：18位数字）">
+        <input type="text" id="phone" placeholder="请输入手机号（模拟：11位数字）">
+        <button onclick="submitAuth()">提交实名认证</button>
+    </div>
+    <div class="data-analysis">
+        <h4>数据抓取&需求分析&同等分析（模拟）</h4>
+        <p>✅ 实名认证数据抓取：姓名/身份证/手机号已加密存储，仅展示脱敏后数据</p>
+        <p>✅ 需求分析：用户核心需求为「环球港→佘山」便捷出行+景点体验+互动社交</p>
+        <p>✅ 同等分析：对比同类旅游小游戏，新增「实时路线规划+厕所/休息站分布」差异化功能</p>
+    </div>
+</div>
+
+<!-- 阶段二：车票认证模块 -->
+<div class="module" id="ticket-module">
+    <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">阶段二：车票认证（模拟）</h2>
+    <p class="tips">请选择车票分类，确认后解锁游戏互动环节</p>
+    <div class="ticket-filter">
+        <button class="filter-btn active" data-type="all">全部车票</button>
+        <button class="filter-btn" data-type="route">同程分类</button>
+        <button class="filter-btn" data-type="age">年龄分类</button>
+        <button class="filter-btn" data-type="dest">目的地分类</button>
+        <button class="filter-btn" data-type="purpose">目的分类</button>
+    </div>
+    <div class="ticket-confirm">
+        <button class="ticket-confirm-btn" onclick="confirmTicketFilter()">确认车票分类</button>
+    </div>
+    <div class="ticket-list" id="ticketList">
+        <!-- 车票卡片由JS动态生成 -->
+    </div>
+</div>
+
+<!-- 阶段三：游戏互动模块（完整修复版） -->
+<div class="module" id="game-module">
+    <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">阶段三：环球港→佘山 定向旅游小游戏（完整地图版）</h2>
+    <div class="game-container">
+        <!-- 3D交互地图区域（解决所有问题） -->
+        <div class="map-area" id="mapArea">
+            <div class="route-tips">💡 点击【终点：佘山】自动规划最优路线</div>
+            <!-- SVG路线容器 -->
+            <svg id="routeSvg" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: 3;">
+                <path id="routePath" d="" fill="none" stroke="url(#routeGradient)" stroke-width="4" stroke-linecap="round" stroke-dasharray="1500" stroke-dashoffset="1500" opacity="0">
+                    <animate id="routeAnimation" attributeName="stroke-dashoffset" from="1500" to="0" dur="3s" fill="freeze" begin="indefinite" />
+                </path>
+                <defs>
+                    <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#e74c3c" />
+                        <stop offset="100%" style="stop-color:#f39c12" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <!-- 地图节点（全部在容器内，重新编排坐标） -->
+            <div class="map-node node-start" style="top: 50px; left: 50px;">
+                <div class="icon">📍</div>
+                <div class="name">起点：环球港</div>
+            </div>
+            <div class="map-node node-shop" style="top: 100px; left: 120px;">
+                <div class="icon">🍟</div>
+                <div class="name">肯德基（环球港店）</div>
+            </div>
+            <div class="map-node node-scenic" style="top: 180px; left: 80px;" onclick="showScenicModal('长风公园')">
+                <div class="icon">🏞️</div>
+                <div class="name">长风公园</div>
+            </div>
+            <div class="map-node node-toilet" style="top: 250px; left: 200px;">
+                <div class="icon">🚻</div>
+                <div class="name">公共厕所（普陀）</div>
+            </div>
+            <div class="map-node node-rest" style="top: 350px; left: 250px;">
+                <div class="icon">🛋️</div>
+                <div class="name">休息站（普陀段）</div>
+            </div>
+            <div class="map-node node-shop" style="top: 300px; left: 300px;">
+                <div class="icon">🍔</div>
+                <div class="name">麦当劳（虹桥店）</div>
+            </div>
+            <div class="map-node node-scenic" style="top: 450px; left: 400px;" onclick="showScenicModal('虹桥天地')">
+                <div class="icon">🏙️</div>
+                <div class="name">虹桥天地</div>
+            </div>
+            <div class="map-node node-rest" style="top: 550px; left: 500px;">
+                <div class="icon">🛋️</div>
+                <div class="name">休息站（松江段）</div>
+            </div>
+            <div class="map-node node-scenic" style="top: 500px; left: 550px;" onclick="showScenicModal('上海辰山植物园')">
+                <div class="icon">🌿</div>
+                <div class="name">辰山植物园</div>
+            </div>
+            <div class="map-node node-toilet" style="top: 650px; left: 500px;">
+                <div class="icon">🚻</div>
+                <div class="name">公共厕所（松江）</div>
+            </div>
+            <div class="map-node node-shop" style="top: 600px; left: 550px;">
+                <div class="icon">☕</div>
+                <div class="name">星巴克（佘山店）</div>
+            </div>
+            <!-- 终点（容器内右下角，完全可见） -->
+            <div class="map-node node-end" id="nodeEnd" style="top: 650px; left: 600px;" onclick="planRoute()">
+                <div class="icon">🏁</div>
+                <div class="name">终点：佘山</div>
+            </div>
+        </div>
+
+        <!-- 右侧面板：保持不变 -->
+        <div class="side-panel">
+            <div class="route-filter">
+                <h3>路线/目的地自动分类</h3>
+                <button class="route-filter-btn active" data-filter="all">全部用户</button>
+                <button class="route-filter-btn" data-filter="sameRoute">同路线（环球港→佘山）</button>
+                <button class="route-filter-btn" data-filter="sameDest">同目的地（佘山）</button>
+            </div>
+            <div class="online-users" id="onlineUserList">
+                <h3>实时共享同频在线用户</h3>
+            </div>
+            <div class="chat-area">
+                <h3 style="padding: 10px; border-bottom: 1px solid #ddd; color: #2c3e50;">角色互动交流</h3>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="输入消息和在线用户互动...">
+                    <button onclick="sendChat()">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 景点介绍弹窗 -->
+<div class="scenic-modal" id="scenicModal">
+    <span class="modal-close" onclick="closeScenicModal()">×</span>
+    <h3 id="scenicName" style="margin-bottom: 15px; color: #2c3e50;"></h3>
+    <img src="" id="scenicImg" class="scenic-img">
+    <p id="scenicDesc"></p>
+    <div class="scenic-route-tips" id="scenicRouteTips"></div>
+</div>
+
 <script>
-    let currentStep = 1;
-
-    function nextStep(step) {
-        document.getElementById(`step $ {step}`).classList.remove('active');
-        document.getElementById(`step $ {step + 1}`).classList.add('active');
-        currentStep = step + 1;
-
-        if (currentStep === 3) {
-            simulateOnlineUsers();
+    // ========== 全局状态 ==========
+    let stepStatus = {
+        step1Done: false,
+        step2Done: false
+    };
+    // 当前规划的路线节点
+    let plannedRouteNodes = [];
+    // 在线用户数据（含路线/目的地信息）
+    const userData = [
+        { id: 1, name: '游客1', avatar: '游', route: '环球港→佘山', dest: '佘山', purpose: '旅游观光' },
+        { id: 2, name: '游客2', avatar: '客', route: '环球港→佘山', dest: '佘山', purpose: '亲子游玩' },
+        { id: 3, name: '游客3', avatar: '小', route: '人民广场→佘山', dest: '佘山', purpose: '休闲' },
+        { id: 4, name: '游客4', avatar: '明', route: '环球港→辰山植物园', dest: '辰山植物园', purpose: '拍照' },
+        { id: 5, name: '游客5', avatar: '丽', route: '环球港→佘山', dest: '佘山', purpose: '登山' },
+        { id: 6, name: '游客6', avatar: '强', route: '虹桥→辰山植物园', dest: '辰山植物园', purpose: '科普' },
+    ];
+    // 聊天消息数据
+    const chatData = [
+        { sender: '游客1', content: '有没有一起走环球港→佘山路线的？', isSelf: false },
+        { sender: '游客2', content: '我刚到普陀段休息站，有没有人一起？', isSelf: false },
+    ];
+    // 景点数据（关联路线）
+    const scenicData = {
+        '长风公园': {
+            img: '../img/changfeng.jpg',
+            desc: '长风公园位于普陀区，是上海老牌的城市公园，拥有大片湖面和绿植，是环球港→佘山路线上的首个途经景点，适合短暂休憩。',
+            routeTips: '✅ 该景点在【环球港→佘山】规划路线上，距离起点约5km'
+        },
+        '虹桥天地': {
+            img: './img/hongqiao.jpg',
+            desc: '虹桥天地位于虹桥商务区，是集购物、餐饮、休闲于一体的商业综合体，是环球港→佘山路线的中间节点，适合补充物资。',
+            routeTips: '✅ 该景点在【环球港→佘山】规划路线上，距离起点约15km'
+        },
+        '上海辰山植物园': {
+            img: './img/chenshan.webp',
+            desc: '上海辰山植物园位于佘山附近，是华东地区规模最大的植物园之一，拥有热带花果馆、沙生植物馆等特色场馆。',
+            routeTips: '✅ 该景点在【环球港→佘山】规划路线上，距离终点约3km'
         }
+    };
+    // 车票数据
+    const ticketData = [
+        { id: 1, route: '环球港→佘山（地铁11号线）', age: '20-30岁', dest: '佘山国家森林公园', purpose: '旅游观光', name: '张三' },
+        { id: 2, route: '环球港→佘山（自驾）', age: '30-40岁', dest: '辰山植物园', purpose: '亲子游玩', name: '李四' },
+        { id: 3, route: '环球港→佘山（公交）', age: '40-50岁', dest: '佘山', purpose: '休闲散步', name: '王五' },
+        { id: 4, route: '人民广场→佘山', age: '20-30岁', dest: '佘山国家森林公园', purpose: '旅游观光', name: '赵六' },
+        { id: 5, route: '环球港→佘山（地铁11号线）', age: '50+岁', dest: '佘山', purpose: '养老休闲', name: '孙七' },
+    ];
+
+    // ========== 步骤切换逻辑 ==========
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const modules = document.querySelectorAll('.module');
+    const stepBar = document.getElementById('stepBar');
+    const stepItems = document.querySelectorAll('.step-item');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.classList.contains('disabled')) {
+                alert('请先完成上一阶段的操作！');
+                return;
+            }
+            navBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = btn.getAttribute('data-target');
+            modules.forEach(module => {
+                module.classList.remove('active');
+                if (module.id === target) {
+                    module.classList.add('active');
+                }
+            });
+            const stepNum = btn.id.replace('nav', '');
+            stepItems.forEach((item, index) => {
+                item.classList.remove('active');
+                if (index + 1 === parseInt(stepNum)) {
+                    item.classList.add('active');
+                }
+            });
+            if (target === 'ticket-module') initTicketList();
+            if (target === 'game-module') initGameData();
+        });
+    });
+
+    // ========== 阶段一：实名认证 ==========
+    function submitAuth() {
+        const realName = document.getElementById('realName').value;
+        const idCard = document.getElementById('idCard').value;
+        const phone = document.getElementById('phone').value;
+        if (!realName || !idCard || !phone) {
+            alert('请填写完整实名认证信息！');
+            return;
+        }
+        alert(`实名认证成功！\n脱敏后数据：\n姓名：${realName.substring(0,1)}*\n身份证：${idCard.substring(0,6)}********${idCard.substring(14)}\n手机号：${phone.substring(0,3)}****${phone.substring(7)}`);
+        stepStatus.step1Done = true;
+        stepBar.className = 'step-bar step-2';
+        stepItems[0].classList.remove('active');
+        stepItems[0].classList.add('done');
+        stepItems[1].classList.add('active');
+        document.getElementById('nav2').classList.remove('disabled');
+        document.getElementById('nav2').click();
     }
 
-    // 模拟在线用户
-    function simulateOnlineUsers() {
-        const users = [
-            { name: '游客A', route: '环球港→佘山', dist: '0.5km' },
-            { name: '亲子家庭', route: '环球港→佘山', dist: '1.2km' },
-            { name: '摄影爱好者', route: '徐家汇→佘山', dist: '3.0km' }
-        ];
-        const list = document.getElementById('onlineUsers');
-        list.innerHTML = users.map(u =>
-            `<div class="user-item">👤  $ {u.name} | 同路线 | 距离你  $ {u.dist}</div>`
-        ).join('');
+    // ========== 阶段二：车票认证 ==========
+    function initTicketList() {
+        const ticketList = document.getElementById('ticketList');
+        ticketList.innerHTML = '';
+        renderTickets(ticketData);
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const type = btn.getAttribute('data-type');
+                let filteredTickets = ticketData;
+                switch (type) {
+                    case 'route': filteredTickets = ticketData.filter(t => t.route.includes('环球港→佘山')); break;
+                    case 'age': filteredTickets = ticketData.filter(t => t.age === '20-30岁'); break;
+                    case 'dest': filteredTickets = ticketData.filter(t => t.dest === '佘山国家森林公园'); break;
+                    case 'purpose': filteredTickets = ticketData.filter(t => t.purpose === '旅游观光'); break;
+                    default: filteredTickets = ticketData;
+                }
+                renderTickets(filteredTickets);
+            });
+        });
+    }
+    function renderTickets(tickets) {
+        const ticketList = document.getElementById('ticketList');
+        ticketList.innerHTML = '';
+        tickets.forEach(ticket => {
+            const card = document.createElement('div');
+            card.className = 'ticket-card';
+            card.innerHTML = `
+                    <h4>车票ID：${ticket.id}</h4>
+                    <p>乘客：${ticket.name}</p>
+                    <p>路线：${ticket.route}</p>
+                    <p>年龄：${ticket.age}</p>
+                    <p>目的地：${ticket.dest}</p>
+                    <p>出行目的：${ticket.purpose}</p>
+                `;
+            ticketList.appendChild(card);
+        });
+    }
+    function confirmTicketFilter() {
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-type');
+        const filterName = {
+            'all': '全部车票',
+            'route': '同程分类',
+            'age': '年龄分类',
+            'dest': '目的地分类',
+            'purpose': '目的分类'
+        };
+        alert(`车票分类确认成功！当前选中：${filterName[activeFilter]}`);
+        stepStatus.step2Done = true;
+        stepBar.className = 'step-bar step-3';
+        stepItems[1].classList.remove('active');
+        stepItems[1].classList.add('done');
+        stepItems[2].classList.add('active');
+        document.getElementById('nav3').classList.remove('disabled');
+        document.getElementById('nav3').click();
     }
 
-    // 模拟互动
-    function sendGreeting() {
-        const greetings = ['你好呀！一起爬山吗？', '前面有观景台，推荐去看看！', '需要路线帮助吗？'];
-        const msg = greetings[Math.floor(Math.random() * greetings.length)];
-        document.getElementById('chatBox').innerHTML =
-            `<em style="color:#1890ff">【你】</em>  $ {msg}<br/>` +
-            `<em style="color:#52c41a">【游客A】</em> 好啊！我在天文台等你～`;
+    // ========== 阶段三：核心功能 - 地图&路线规划 ==========
+    // 初始化游戏数据
+    function initGameData() {
+        // 渲染在线用户
+        renderOnlineUsers('all');
+        // 渲染聊天消息
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = '';
+        chatData.forEach(msg => {
+            addChatMsg(msg.sender, msg.content, msg.isSelf);
+        });
+        // 路线/目的地分类筛选
+        const routeFilterBtns = document.querySelectorAll('.route-filter-btn');
+        routeFilterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                routeFilterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filterType = btn.getAttribute('data-filter');
+                renderOnlineUsers(filterType);
+            });
+        });
     }
 
-    // 自动填充（方便演示）
-    document.getElementById('name').value = '张三';
+    // 自动规划路线（精准经过所有节点）
+    let isRouting = false; // 状态锁：防止重复点击触发
+    function planRoute() {
+        // 1. 防止重复触发：如果正在规划，直接返回
+        if (isRouting) return;
+        isRouting = true;
+
+        // 2. 重置之前的路线和节点状态（关键修复）
+        document.getElementById('routePath').style.opacity = '0'; // 隐藏原有路线
+        document.querySelectorAll('.map-node').forEach(node => {
+            node.classList.remove('highlight'); // 取消所有节点高亮
+        });
+
+        // 3. 重新计算的节点坐标（全部在容器内）
+        const nodeCoords = {
+            start: {x: 50, y: 50},
+            kfc: {x: 120, y: 100},
+            park: {x: 80, y: 180},
+            toilet1: {x: 200, y: 250},
+            rest1: {x: 250, y: 350},
+            mcd: {x: 300, y: 300},
+            mall: {x: 400, y: 450},
+            rest2: {x: 500, y: 550},
+            garden: {x: 550, y: 500},
+            toilet2: {x: 500, y: 650},
+            starbucks: {x: 550, y: 600},
+            end: {x: 600, y: 650}
+        };
+
+        // 4. 生成并显示新路线
+        const pathD = `
+        M ${nodeCoords.start.x} ${nodeCoords.start.y}
+        L ${nodeCoords.kfc.x} ${nodeCoords.kfc.y}
+        L ${nodeCoords.park.x} ${nodeCoords.park.y}
+        L ${nodeCoords.toilet1.x} ${nodeCoords.toilet1.y}
+        L ${nodeCoords.rest1.x} ${nodeCoords.rest1.y}
+        L ${nodeCoords.mcd.x} ${nodeCoords.mcd.y}
+        L ${nodeCoords.mall.x} ${nodeCoords.mall.y}
+        L ${nodeCoords.rest2.x} ${nodeCoords.rest2.y}
+        L ${nodeCoords.garden.x} ${nodeCoords.garden.y}
+        L ${nodeCoords.starbucks.x} ${nodeCoords.starbucks.y}
+        L ${nodeCoords.toilet2.x} ${nodeCoords.toilet2.y}
+        L ${nodeCoords.end.x} ${nodeCoords.end.y}
+    `;
+        document.getElementById('routePath').setAttribute('d', pathD);
+        document.getElementById('routePath').style.opacity = '1';
+        document.getElementById('routeAnimation').beginElement();
+
+        // 5. 同步高亮节点
+        const nodes = document.querySelectorAll('.map-node');
+        nodes.forEach((node, index) => {
+            setTimeout(() => {
+                node.classList.add('highlight');
+            }, index * 250);
+        });
+
+        // 6. 路线提示弹窗（仅弹出一次）
+        setTimeout(() => {
+            alert(`✅ 环球港→佘山 最优路线规划完成！
+📌 全程途经点（按顺序）：
+1. 起点：环球港
+2. 商业店：肯德基（环球港店）
+3. 景点：长风公园（可点击查看详情）
+4. 公共设施：公共厕所（普陀）
+5. 公共设施：休息站（普陀段）
+6. 商业店：麦当劳（虹桥店）
+7. 景点：虹桥天地（可点击查看详情）
+8. 公共设施：休息站（松江段）
+9. 景点：上海辰山植物园（可点击查看详情）
+10. 商业店：星巴克（佘山店）
+11. 公共设施：公共厕所（松江）
+12. 终点：佘山国家森林公园
+
+🗺️ 路线信息：
+• 全程约30km，预计行程1.5小时
+• 途经3个核心景点、2个公共厕所、2个休息站、3个商业店
+• 点击路线上的节点，可查看对应地点详情
+• 同路线用户已实时同步，可在右侧面板互动交流～`);
+            // 7. 规划完成，释放状态锁
+            isRouting = false;
+        }, 3000);
+    }
+
+    // 渲染在线用户（核心需求4+5）
+    function renderOnlineUsers(filterType) {
+        const userList = document.getElementById('onlineUserList');
+        userList.innerHTML = '';
+        let filteredUsers = userData;
+        // 自动分类筛选
+        if (filterType === 'sameRoute') {
+            filteredUsers = userData.filter(u => u.route === '环球港→佘山');
+        } else if (filterType === 'sameDest') {
+            filteredUsers = userData.filter(u => u.dest === '佘山');
+        }
+        // 渲染用户列表
+        filteredUsers.forEach(user => {
+            const userItem = document.createElement('div');
+            // 标记同路线用户
+            const isSameRoute = user.route === '环球港→佘山';
+            userItem.className = `user-item ${isSameRoute ? 'same-route' : ''}`;
+            userItem.innerHTML = `
+                    <div class="user-avatar">${user.avatar}</div>
+                    <div>
+                        <p><strong>${user.name}</strong></p>
+                        <p class="user-route">路线：${user.route} | 目的地：${user.dest}</p>
+                    </div>
+                    ${isSameRoute ? '<div class="user-tag">同路线</div>' : ''}
+                `;
+            // 点击用户触发互动
+            userItem.addEventListener('click', () => {
+                document.querySelectorAll('.user-item').forEach(item => item.style.background = '');
+                userItem.style.background = '#f8f9fa';
+                addChatMsg(user.name, `你好！我也是去${user.dest}的，走${user.route}路线～`, false);
+            });
+            userList.appendChild(userItem);
+        });
+    }
+
+    // 景点介绍（核心需求2）
+    function showScenicModal(name) {
+        const modal = document.getElementById('scenicModal');
+        const scenic = scenicData[name] || scenicData['佘山国家森林公园'];
+        document.getElementById('scenicName').innerText = name;
+        document.getElementById('scenicImg').src = scenic.img;
+        document.getElementById('scenicDesc').innerText = scenic.desc;
+        document.getElementById('scenicRouteTips').innerText = scenic.routeTips;
+        modal.style.display = 'block';
+    }
+    function closeScenicModal() {
+        document.getElementById('scenicModal').style.display = 'none';
+    }
+
+    // 角色互动（核心需求6）
+    function addChatMsg(sender, content, isSelf) {
+        const chatMessages = document.getElementById('chatMessages');
+        const msg = document.createElement('div');
+        msg.className = `chat-msg ${isSelf ? 'msg-self' : 'msg-other'}`;
+        msg.innerHTML = `<strong>${sender}：</strong>${content}`;
+        chatMessages.appendChild(msg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    function sendChat() {
+        const input = document.getElementById('chatInput');
+        const content = input.value.trim();
+        if (!content) return;
+        addChatMsg('我', content, true);
+        input.value = '';
+        // 模拟同路线用户回复
+        setTimeout(() => {
+            const sameRouteUsers = userData.filter(u => u.route === '环球港→佘山');
+            const randomUser = sameRouteUsers[Math.floor(Math.random() * sameRouteUsers.length)];
+            const replies = [
+                `我刚到${randomUser.route.split('→')[0]}，一起走吗？`,
+                `${content}！我也觉得这条路线上的辰山植物园超美～`,
+                `提醒一下，路线上的普陀休息站有免费饮用水哦！`,
+                `我已经到终点了，佘山的风景超棒，快过来！`
+            ];
+            const randomReply = replies[Math.floor(Math.random() * replies.length)];
+            addChatMsg(randomUser.name, randomReply, false);
+        }, 1000);
+    }
+
+    // ========== 初始化 ==========
+    window.onload = function() {
+        initTicketList();
+    };
 </script>
 </body>
 </html>
