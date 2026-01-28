@@ -544,6 +544,154 @@
             font-size: 14px;
             color: #27ae60;
         }
+        /* ========== 移动端适配核心样式（768px以下手机屏幕） ========== */
+@media (max-width: 768px) {
+    /* 全局调整：取消横向滚动，适配屏幕宽度 */
+    body {
+        padding-bottom: 10px;
+        overflow-x: hidden;
+    }
+
+    /* 流程容器：适配手机宽度 */
+    .process-container {
+        width: 98%;
+        margin: 10px auto;
+        gap: 10px;
+    }
+
+    /* 步骤条：缩小节点尺寸，调整文字 */
+    .step-bar {
+        padding: 0 10px;
+    }
+    .step-item {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+    .step-item .step-name {
+        font-size: 12px;
+        top: 40px;
+    }
+
+    /* 导航栏：垂直排列，适配手机 */
+    .nav {
+        flex-direction: column;
+        padding: 10px;
+        gap: 8px;
+    }
+    .nav-btn {
+        width: 100%;
+        margin: 0;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* 模块容器：适配手机宽度，减少内边距 */
+    .module {
+        width: 98%;
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+
+    /* 游戏容器：从左右布局改为上下布局（核心适配） */
+    .game-container {
+        flex-direction: column;
+        height: auto !important; /* 取消固定高度，自适应 */
+        gap: 15px;
+    }
+
+    /* 地图区域：适配手机高度，取消固定尺寸 */
+    .map-area {
+        flex: none;
+        height: 500px !important; /* 手机端适配高度 */
+        width: 100%;
+        overflow: auto; /* 允许移动端滚动查看完整地图 */
+    }
+
+    /* 地图节点：缩小尺寸，适配手机屏幕 */
+    .map-node {
+        padding: 1px 3px;
+        transform: translateZ(10px);
+    }
+    .map-node .icon {
+        font-size: 20px;
+        margin-bottom: 2px;
+    }
+    .map-node .name {
+        font-size: 11px;
+        padding: 1px 3px;
+    }
+    /* 调整节点坐标，避免手机端错位 */
+    .map-node.node-start { top: 30px; left: 20px; }
+    .map-node.node-end { top: 450px; left: 250px; }
+    .map-node.node-shop { top: 80px; left: 80px; }
+    .map-node.node-scenic { top: 150px; left: 50px; }
+    .map-node.node-toilet { top: 220px; left: 150px; }
+    .map-node.node-rest { top: 300px; left: 200px; }
+
+    /* 右侧面板：适配手机宽度，flex占满 */
+    .side-panel {
+        flex: none;
+        width: 100%;
+        gap: 10px;
+    }
+    /* 路线筛选按钮：适配手机 */
+    .route-filter-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    /* 在线用户/聊天区：适配手机高度 */
+    .online-users {
+        max-height: 200px;
+    }
+    .chat-area {
+        max-height: 250px;
+    }
+
+    /* 景点弹窗：适配手机屏幕（核心） */
+    .scenic-modal {
+        width: 90% !important; /* 占屏幕90%宽度 */
+        padding: 15px;
+    }
+    .scenic-img {
+        height: 180px !important; /* 手机端图片高度 */
+    }
+
+    /* 表单元素：放大输入框/按钮，适配手机点击 */
+    .auth-form input, .auth-form button {
+        padding: 14px;
+        font-size: 16px;
+    }
+    .ticket-confirm-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+    .chat-input input {
+        padding: 10px;
+        font-size: 16px;
+    }
+    .chat-input button {
+        padding: 10px 15px;
+    }
+
+    /* 车票卡片：手机端单列显示 */
+    .ticket-list {
+        grid-template-columns: 1fr; /* 取消多列，单列 */
+    }
+}
+
+/* 更小屏幕（480px以下，如小屏手机）额外优化 */
+@media (max-width: 480px) {
+    .map-area {
+        height: 400px !important;
+    }
+    .scenic-img {
+        height: 150px !important;
+    }
+    .step-item .step-name {
+        font-size: 10px;
+    }
+}
     </style>
 </head>
 <body>
@@ -1065,5 +1213,6 @@
 </script>
 </body>
 </html>
+
 
 
