@@ -545,167 +545,154 @@
             color: #27ae60;
         }
         /* ========== 移动端适配核心样式（768px以下手机屏幕） ========== */
-@media (max-width: 768px) {
-    /* 全局调整：取消横向滚动，适配屏幕宽度 */
-    body {
-        padding-bottom: 10px;
-        overflow-x: hidden;
-    }
+        @media (max-width: 768px) {
+            /* 全局调整：取消横向滚动，适配屏幕宽度 */
+            body {
+                padding-bottom: 10px;
+                overflow-x: hidden;
+            }
 
-    /* 流程容器：适配手机宽度 */
-    .process-container {
-        width: 98%;
-        margin: 10px auto;
-        gap: 10px;
-    }
+            /* 流程容器：适配手机宽度 */
+            .process-container {
+                width: 98%;
+                margin: 10px auto;
+                gap: 10px;
+            }
 
-    /* 步骤条：缩小节点尺寸，调整文字 */
-    .step-bar {
-        padding: 0 10px;
-    }
-    .step-item {
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-    }
-    .step-item .step-name {
-        font-size: 12px;
-        top: 40px;
-    }
+            /* 步骤条：缩小节点尺寸，调整文字 */
+            .step-bar {
+                padding: 0 10px;
+            }
+            .step-item {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            .step-item .step-name {
+                font-size: 12px;
+                top: 40px;
+            }
 
-    /* 导航栏：垂直排列，适配手机 */
-    .nav {
-        flex-direction: column;
-        padding: 10px;
-        gap: 8px;
-    }
-    .nav-btn {
-        width: 100%;
-        margin: 0;
-        padding: 12px;
-        font-size: 14px;
-    }
+            /* 导航栏：垂直排列，适配手机 */
+            .nav {
+                flex-direction: column;
+                padding: 10px;
+                gap: 8px;
+            }
+            .nav-btn {
+                width: 100%;
+                margin: 0;
+                padding: 12px;
+                font-size: 14px;
+            }
 
-    /* 模块容器：适配手机宽度，减少内边距 */
-    .module {
-        width: 98%;
-        padding: 15px;
-        margin-bottom: 10px;
-    }
+            /* 模块容器：适配手机宽度，减少内边距 */
+            .module {
+                width: 98%;
+                padding: 15px;
+                margin-bottom: 10px;
+            }
 
-    /* 游戏容器：从左右布局改为上下布局（核心适配） */
-    .game-container {
-        flex-direction: column;
-        height: auto !important; /* 取消固定高度，自适应 */
-        gap: 15px;
-    }
+            /* 游戏容器：从左右布局改为上下布局（核心适配） */
+            .game-container {
+                flex-direction: column;
+                height: auto !important; /* 取消固定高度，自适应 */
+                gap: 15px;
+            }
 
-    /* 地图区域：适配手机高度，取消固定尺寸 */
-    .map-area {
-        flex: none;
-        height: 500px !important; /* 手机端适配高度 */
-        width: 100%;
-        overflow: auto; /* 允许移动端滚动查看完整地图 */
-        touch-action: pinch-zoom; /* 允许手机端双指缩放 */
-    }
+            /* 地图区域：适配手机高度，取消固定尺寸 */
+            .map-area {
+                flex: none;
+                height: 500px !important; /* 手机端适配高度 */
+                width: 100%;
+                overflow: auto; /* 允许移动端滚动查看完整地图 */
+            }
 
-    /* 地图节点：缩小尺寸，适配手机屏幕 */
-    .map-node {
-        padding: 1px 3px;
-        transform: translateZ(10px);
-    }
-    .map-node .icon {
-        font-size: 20px;
-        margin-bottom: 2px;
-    }
-    .map-node .name {
-        font-size: 11px;
-        padding: 1px 3px;
-    }
-    /* 调整节点坐标，避免手机端错位 */
-    .map-node.node-start { top: 30px; left: 20px; }
-    .map-node.node-end { top: 450px; left: 250px; }
-    .map-node.node-shop { top: 80px; left: 80px; }
-    .map-node.node-scenic { top: 150px; left: 50px; }
-    .map-node.node-toilet { top: 220px; left: 150px; }
-    .map-node.node-rest { top: 300px; left: 200px; }
+            /* 地图节点：缩小尺寸，适配手机屏幕 */
+            .map-node {
+                padding: 1px 3px;
+                transform: translateZ(10px);
+            }
+            .map-node .icon {
+                font-size: 20px;
+                margin-bottom: 2px;
+            }
+            .map-node .name {
+                font-size: 11px;
+                padding: 1px 3px;
+            }
+            /* 调整节点坐标，避免手机端错位 */
+            .map-node.node-start { top: 30px; left: 20px; }
+            .map-node.node-end { top: 450px; left: 250px; }
+            .map-node.node-shop { top: 80px; left: 80px; }
+            .map-node.node-scenic { top: 150px; left: 50px; }
+            .map-node.node-toilet { top: 220px; left: 150px; }
+            .map-node.node-rest { top: 300px; left: 200px; }
 
-    /* 右侧面板：适配手机宽度，flex占满 */
-    .side-panel {
-        flex: none;
-        width: 100%;
-        gap: 10px;
-    }
-    /* 路线筛选按钮：适配手机 */
-    .route-filter-btn {
-        padding: 5px 10px;
-        font-size: 12px;
-    }
-    /* 在线用户/聊天区：适配手机高度 */
-    .online-users {
-        max-height: 200px;
-    }
-    .chat-area {
-        max-height: 250px;
-    }
+            /* 右侧面板：适配手机宽度，flex占满 */
+            .side-panel {
+                flex: none;
+                width: 100%;
+                gap: 10px;
+            }
+            /* 路线筛选按钮：适配手机 */
+            .route-filter-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            /* 在线用户/聊天区：适配手机高度 */
+            .online-users {
+                max-height: 200px;
+            }
+            .chat-area {
+                max-height: 250px;
+            }
 
-    /* 景点弹窗：适配手机屏幕（核心） */
-    .scenic-modal {
-        width: 90% !important; /* 占屏幕90%宽度 */
-        padding: 15px;
-    }
-    .scenic-img {
-        height: 180px !important; /* 手机端图片高度 */
-    }
+            /* 景点弹窗：适配手机屏幕（核心） */
+            .scenic-modal {
+                width: 90% !important; /* 占屏幕90%宽度 */
+                padding: 15px;
+            }
+            .scenic-img {
+                height: 180px !important; /* 手机端图片高度 */
+            }
 
-    /* 表单元素：放大输入框/按钮，适配手机点击 */
-    .auth-form input, .auth-form button {
-        padding: 14px;
-        font-size: 16px;
-    }
-    .ticket-confirm-btn {
-        padding: 12px 20px;
-        font-size: 16px;
-    }
-    .chat-input input {
-        padding: 10px;
-        font-size: 16px;
-    }
-    .chat-input button {
-        padding: 10px 15px;
-    }
+            /* 表单元素：放大输入框/按钮，适配手机点击 */
+            .auth-form input, .auth-form button {
+                padding: 14px;
+                font-size: 16px;
+            }
+            .ticket-confirm-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            .chat-input input {
+                padding: 10px;
+                font-size: 16px;
+            }
+            .chat-input button {
+                padding: 10px 15px;
+            }
 
-    /* 车票卡片：手机端单列显示 */
-    .ticket-list {
-        grid-template-columns: 1fr; /* 取消多列，单列 */
-    }
-}
-
-/* 更小屏幕（480px以下，如小屏手机）额外优化 */
-@media (max-width: 480px) {
-    .map-area {
-        height: 400px !important;
-    }
-    .scenic-img {
-        height: 150px !important;
-    }
-    .step-item .step-name {
-        font-size: 10px;
-    }
-}
-
-        /* 缩放容器：默认不缩放，设置缩放原点 */
-        .map-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform-origin: top left; /* 缩放原点：左上角 */
-            transition: transform 0.1s ease; /* 缩放过渡更顺滑 */
+            /* 车票卡片：手机端单列显示 */
+            .ticket-list {
+                grid-template-columns: 1fr; /* 取消多列，单列 */
+            }
         }
 
-        
+        /* 更小屏幕（480px以下，如小屏手机）额外优化 */
+        @media (max-width: 480px) {
+            .map-area {
+                height: 400px !important;
+            }
+            .scenic-img {
+                height: 150px !important;
+            }
+            .step-item .step-name {
+                font-size: 10px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -777,10 +764,9 @@
     <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">阶段三：环球港→佘山 定向旅游小游戏（完整地图版）</h2>
     <div class="game-container">
         <!-- 3D交互地图区域（解决所有问题） -->
+
         <div class="map-area" id="mapArea">
             <div class="route-tips">💡 点击【终点：佘山】自动规划最优路线</div>
-            <!-- 新增：缩放容器 -->
-            <div class="map-content" id="mapContent">
                 <!-- SVG路线容器 -->
                 <svg id="routeSvg" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: 3;">
                     <!-- 路线代码不变 -->
@@ -836,8 +822,8 @@
                     <div class="name">终点：佘山</div>
                 </div>
                 <!-- 其他节点代码不变 -->
-            </div>
         </div>
+
 
         <!-- 右侧面板：保持不变 -->
         <div class="side-panel">
@@ -896,17 +882,17 @@
     // 景点数据（关联路线）
     const scenicData = {
         '长风公园': {
-            img: './changfeng.jpg',
+            img: '../img/changfeng.jpg',
             desc: '长风公园位于普陀区，是上海老牌的城市公园，拥有大片湖面和绿植，是环球港→佘山路线上的首个途经景点，适合短暂休憩。',
             routeTips: '✅ 该景点在【环球港→佘山】规划路线上，距离起点约5km'
         },
         '虹桥天地': {
-            img: './hongqiao.jpg',
+            img: './img/hongqiao.jpg',
             desc: '虹桥天地位于虹桥商务区，是集购物、餐饮、休闲于一体的商业综合体，是环球港→佘山路线的中间节点，适合补充物资。',
             routeTips: '✅ 该景点在【环球港→佘山】规划路线上，距离起点约15km'
         },
         '上海辰山植物园': {
-            img: './chenshan.webp',
+            img: './img/chenshan.webp',
             desc: '上海辰山植物园位于佘山附近，是华东地区规模最大的植物园之一，拥有热带花果馆、沙生植物馆等特色场馆。',
             routeTips: '✅ 该景点在【环球港→佘山】规划路线上，距离终点约3km'
         }
@@ -1221,55 +1207,6 @@
         initTicketList();
     };
 
-    // 缩放相关变量
-    let scale = 1; // 当前缩放比例
-    const minScale = 0.8; // 最小缩放（避免太小）
-    const maxScale = 2; // 最大缩放（避免太大）
-    let lastDistance = 0; // 上一次双指的距离
-
-    // 获取缩放容器
-    const mapContent = document.getElementById('mapContent');
-    const mapArea = document.getElementById('mapArea');
-
-    // 监听触摸开始事件：记录初始双指距离
-    mapArea.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) { // 只有双指触摸时才触发缩放
-            const touch1 = e.touches[0];
-            const touch2 = e.touches[1];
-            // 计算双指之间的距离（勾股定理）
-            lastDistance = Math.sqrt(
-                Math.pow(touch2.clientX - touch1.clientX, 2) +
-                Math.pow(touch2.clientY - touch1.clientY, 2)
-            );
-        }
-    });
-
-    // 监听触摸移动事件：计算缩放比例
-    mapArea.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
-            e.preventDefault(); // 阻止页面默认滚动，避免影响缩放
-            const touch1 = e.touches[0];
-            const touch2 = e.touches[1];
-            // 计算当前双指距离
-            const currentDistance = Math.sqrt(
-                Math.pow(touch2.clientX - touch1.clientX, 2) +
-                Math.pow(touch2.clientY - touch1.clientY, 2)
-            );
-            // 计算缩放比例变化（当前距离 / 上次距离）
-            const scaleChange = currentDistance / lastDistance;
-            // 更新缩放比例（限制在min-max之间）
-            scale = Math.min(Math.max(scale * scaleChange, minScale), maxScale);
-            // 应用缩放效果
-            mapContent.style.transform = `scale(${scale})`;
-            // 更新上次距离
-            lastDistance = currentDistance;
-        }
-    });
 </script>
 </body>
 </html>
-
-
-
-
-
