@@ -692,6 +692,23 @@
         font-size: 10px;
     }
 }
+
+        /* 缩放容器：默认不缩放，设置缩放原点 */
+        .map-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: top left; /* 缩放原点：左上角 */
+            transition: transform 0.1s ease; /* 缩放过渡更顺滑 */
+        }
+
+        /* 地图区域：允许触摸交互 */
+        .map-area {
+            touch-action: pinch-zoom; /* 允许手机端双指缩放 */
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -765,67 +782,63 @@
         <!-- 3D交互地图区域（解决所有问题） -->
         <div class="map-area" id="mapArea">
             <div class="route-tips">💡 点击【终点：佘山】自动规划最优路线</div>
-            <!-- SVG路线容器 -->
-            <svg id="routeSvg" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: 3;">
-                <path id="routePath" d="" fill="none" stroke="url(#routeGradient)" stroke-width="4" stroke-linecap="round" stroke-dasharray="1500" stroke-dashoffset="1500" opacity="0">
-                    <animate id="routeAnimation" attributeName="stroke-dashoffset" from="1500" to="0" dur="3s" fill="freeze" begin="indefinite" />
-                </path>
-                <defs>
-                    <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#e74c3c" />
-                        <stop offset="100%" style="stop-color:#f39c12" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            <!-- 地图节点（全部在容器内，重新编排坐标） -->
-            <div class="map-node node-start" style="top: 50px; left: 50px;">
-                <div class="icon">📍</div>
-                <div class="name">起点：环球港</div>
-            </div>
-            <div class="map-node node-shop" style="top: 100px; left: 120px;">
-                <div class="icon">🍟</div>
-                <div class="name">肯德基（环球港店）</div>
-            </div>
-            <div class="map-node node-scenic" style="top: 180px; left: 80px;" onclick="showScenicModal('长风公园')">
-                <div class="icon">🏞️</div>
-                <div class="name">长风公园</div>
-            </div>
-            <div class="map-node node-toilet" style="top: 250px; left: 200px;">
-                <div class="icon">🚻</div>
-                <div class="name">公共厕所（普陀）</div>
-            </div>
-            <div class="map-node node-rest" style="top: 350px; left: 250px;">
-                <div class="icon">🛋️</div>
-                <div class="name">休息站（普陀段）</div>
-            </div>
-            <div class="map-node node-shop" style="top: 300px; left: 300px;">
-                <div class="icon">🍔</div>
-                <div class="name">麦当劳（虹桥店）</div>
-            </div>
-            <div class="map-node node-scenic" style="top: 450px; left: 400px;" onclick="showScenicModal('虹桥天地')">
-                <div class="icon">🏙️</div>
-                <div class="name">虹桥天地</div>
-            </div>
-            <div class="map-node node-rest" style="top: 550px; left: 500px;">
-                <div class="icon">🛋️</div>
-                <div class="name">休息站（松江段）</div>
-            </div>
-            <div class="map-node node-scenic" style="top: 500px; left: 550px;" onclick="showScenicModal('上海辰山植物园')">
-                <div class="icon">🌿</div>
-                <div class="name">辰山植物园</div>
-            </div>
-            <div class="map-node node-toilet" style="top: 650px; left: 500px;">
-                <div class="icon">🚻</div>
-                <div class="name">公共厕所（松江）</div>
-            </div>
-            <div class="map-node node-shop" style="top: 600px; left: 550px;">
-                <div class="icon">☕</div>
-                <div class="name">星巴克（佘山店）</div>
-            </div>
-            <!-- 终点（容器内右下角，完全可见） -->
-            <div class="map-node node-end" id="nodeEnd" style="top: 650px; left: 600px;" onclick="planRoute()">
-                <div class="icon">🏁</div>
-                <div class="name">终点：佘山</div>
+            <!-- 新增：缩放容器 -->
+            <div class="map-content" id="mapContent">
+                <!-- SVG路线容器 -->
+                <svg id="routeSvg" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: 3;">
+                    <!-- 路线代码不变 -->
+                </svg>
+                <!-- 所有地图节点（起点、终点、景点等）都放在这里 -->
+                <div class="map-node node-start" style="top: 50px; left: 50px;">
+                    <div class="icon">📍</div>
+                    <div class="name">起点：环球港</div>
+                </div>
+                <div class="map-node node-shop" style="top: 100px; left: 120px;">
+                    <div class="icon">🍟</div>
+                    <div class="name">肯德基（环球港店）</div>
+                </div>
+                <div class="map-node node-scenic" style="top: 180px; left: 80px;" onclick="showScenicModal('长风公园')">
+                    <div class="icon">🏞️</div>
+                    <div class="name">长风公园</div>
+                </div>
+                <div class="map-node node-toilet" style="top: 250px; left: 200px;">
+                    <div class="icon">🚻</div>
+                    <div class="name">公共厕所（普陀）</div>
+                </div>
+                <div class="map-node node-rest" style="top: 350px; left: 250px;">
+                    <div class="icon">🛋️</div>
+                    <div class="name">休息站（普陀段）</div>
+                </div>
+                <div class="map-node node-shop" style="top: 300px; left: 300px;">
+                    <div class="icon">🍔</div>
+                    <div class="name">麦当劳（虹桥店）</div>
+                </div>
+                <div class="map-node node-scenic" style="top: 450px; left: 400px;" onclick="showScenicModal('虹桥天地')">
+                    <div class="icon">🏙️</div>
+                    <div class="name">虹桥天地</div>
+                </div>
+                <div class="map-node node-rest" style="top: 550px; left: 500px;">
+                    <div class="icon">🛋️</div>
+                    <div class="name">休息站（松江段）</div>
+                </div>
+                <div class="map-node node-scenic" style="top: 500px; left: 550px;" onclick="showScenicModal('上海辰山植物园')">
+                    <div class="icon">🌿</div>
+                    <div class="name">辰山植物园</div>
+                </div>
+                <div class="map-node node-toilet" style="top: 650px; left: 500px;">
+                    <div class="icon">🚻</div>
+                    <div class="name">公共厕所（松江）</div>
+                </div>
+                <div class="map-node node-shop" style="top: 600px; left: 550px;">
+                    <div class="icon">☕</div>
+                    <div class="name">星巴克（佘山店）</div>
+                </div>
+                <!-- 终点（容器内右下角，完全可见） -->
+                <div class="map-node node-end" id="nodeEnd" style="top: 650px; left: 600px;" onclick="planRoute()">
+                    <div class="icon">🏁</div>
+                    <div class="name">终点：佘山</div>
+                </div>
+                <!-- 其他节点代码不变 -->
             </div>
         </div>
 
@@ -1210,9 +1223,55 @@
     window.onload = function() {
         initTicketList();
     };
+
+    // 缩放相关变量
+    let scale = 1; // 当前缩放比例
+    const minScale = 0.8; // 最小缩放（避免太小）
+    const maxScale = 2; // 最大缩放（避免太大）
+    let lastDistance = 0; // 上一次双指的距离
+
+    // 获取缩放容器
+    const mapContent = document.getElementById('mapContent');
+    const mapArea = document.getElementById('mapArea');
+
+    // 监听触摸开始事件：记录初始双指距离
+    mapArea.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) { // 只有双指触摸时才触发缩放
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            // 计算双指之间的距离（勾股定理）
+            lastDistance = Math.sqrt(
+                Math.pow(touch2.clientX - touch1.clientX, 2) +
+                Math.pow(touch2.clientY - touch1.clientY, 2)
+            );
+        }
+    });
+
+    // 监听触摸移动事件：计算缩放比例
+    mapArea.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+            e.preventDefault(); // 阻止页面默认滚动，避免影响缩放
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            // 计算当前双指距离
+            const currentDistance = Math.sqrt(
+                Math.pow(touch2.clientX - touch1.clientX, 2) +
+                Math.pow(touch2.clientY - touch1.clientY, 2)
+            );
+            // 计算缩放比例变化（当前距离 / 上次距离）
+            const scaleChange = currentDistance / lastDistance;
+            // 更新缩放比例（限制在min-max之间）
+            scale = Math.min(Math.max(scale * scaleChange, minScale), maxScale);
+            // 应用缩放效果
+            mapContent.style.transform = `scale(${scale})`;
+            // 更新上次距离
+            lastDistance = currentDistance;
+        }
+    });
 </script>
 </body>
 </html>
+
 
 
 
