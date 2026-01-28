@@ -606,6 +606,7 @@
         height: 500px !important; /* 手机端适配高度 */
         width: 100%;
         overflow: auto; /* 允许移动端滚动查看完整地图 */
+        touch-action: pinch-zoom; /* 允许手机端双指缩放 */
     }
 
     /* 地图节点：缩小尺寸，适配手机屏幕 */
@@ -704,11 +705,7 @@
             transition: transform 0.1s ease; /* 缩放过渡更顺滑 */
         }
 
-        /* 地图区域：允许触摸交互 */
-        .map-area {
-            touch-action: pinch-zoom; /* 允许手机端双指缩放 */
-            overflow: hidden;
-        }
+        
     </style>
 </head>
 <body>
@@ -1271,6 +1268,7 @@
 </script>
 </body>
 </html>
+
 
 
 
